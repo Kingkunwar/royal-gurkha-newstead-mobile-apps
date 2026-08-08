@@ -146,45 +146,35 @@ class _EnterPostalCodeWidgetState extends State<EnterPostalCodeWidget> {
                           ),
                         ),
                         padding: EdgeInsets.zero,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: DropdownMenu<String>(
-                                initialSelection: state.fetchedAddresses.first,
+                        child: DropdownMenu<String>(
+                          initialSelection: state.fetchedAddresses.first,
+                          trailingIcon: Icon(Icons.keyboard_arrow_down),
 
-                                textStyle:
-                                    Theme.of(context).textTheme.bodyLarge,
-                                onSelected: (String? value) {
-                                  // This is called when the user selects an item.
-                                  setState(() {
-                                    selectedAddress = value!;
-                                  });
-                                },
-                                // trailingIcon: Icon(
-                                //   Icons.perm_camera_mic,
-                                //   color: Colors.black,
-                                // ),
-                                // trailingIcon: Icon(
-                                //   Icons.keyboard_arrow_down,
-                                //   color: Colors.grey,
-                                //   size: 30.sp,
-                                // ),
-                                dropdownMenuEntries: state.fetchedAddresses
-                                    .map<DropdownMenuEntry<String>>(
-                                  (String value) {
-                                    return DropdownMenuEntry<String>(
-                                      value: value,
-                                      label: value,
-                                    );
-                                  },
-                                ).toList(),
-                              ),
-                            ),
-                            const Icon(
-                              Icons.keyboard_arrow_down,
-                            ),
-                            5.horizontalSpace,
-                          ],
+                          textStyle: Theme.of(context).textTheme.bodyLarge,
+                          onSelected: (String? value) {
+                            // This is called when the user selects an item.
+                            setState(() {
+                              selectedAddress = value!;
+                            });
+                          },
+                          // trailingIcon: Icon(
+                          //   Icons.perm_camera_mic,
+                          //   color: Colors.black,
+                          // ),
+                          // trailingIcon: Icon(
+                          //   Icons.keyboard_arrow_down,
+                          //   color: Colors.grey,
+                          //   size: 30.sp,
+                          // ),
+                          dropdownMenuEntries: state.fetchedAddresses
+                              .map<DropdownMenuEntry<String>>(
+                            (String value) {
+                              return DropdownMenuEntry<String>(
+                                value: value,
+                                label: value,
+                              );
+                            },
+                          ).toList(),
                         ),
                       ),
                     )

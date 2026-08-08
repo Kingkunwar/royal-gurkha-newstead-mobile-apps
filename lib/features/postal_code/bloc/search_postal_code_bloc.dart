@@ -86,8 +86,8 @@ class SearchPostalCodeBloc
 
 Future<List<String>> fetchAddressesFromPostalCode(String query) async {
   List<String> addresses = [];
-  final Response? response = await locator<BaseClient>()
-      .getRequest(path: "/findaddress/${query.replaceAll(" ", "%20")}");
+  final Response? response =
+      await locator<BaseClient>().getRequest(path: "/findaddress/${query}");
   if (response != null && response.statusCode == 200) {
     addresses = response.data?.cast<String>();
   }
