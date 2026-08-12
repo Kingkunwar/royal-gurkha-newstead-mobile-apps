@@ -74,6 +74,7 @@ class AppStatusModel {
     try {
       cashOnDelivery = isVal ? "1" : json['cash_on_delivery'];
       paymentStripe = isVal ? "1" : json['payment_mstripe'];
+      // paymentStripe = "1";
       deliveryEnabled = isVal ? true : json['delivery_enabled'];
       collectionEnabled = isVal ? true : json['collection_enabled'];
       tableReservation = isVal ? "1" : json['table_reservation'];

@@ -65,10 +65,11 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               },
-              if (Platform.isIOS && isLoggedIn)
+              if (isLoggedIn)
                 ListTile(
                   onTap: () {
-                    launchUrl(Uri.parse("https://forms.gle/w3xMW4uKechXjJKP6"));
+                    launchUrl(Uri.parse(
+                        "https://docs.google.com/forms/d/e/1FAIpQLSdgU_LbJXwXyCZ36aDuDNmIMJw3Fk7MqF1eb8PuBD6UA3TxXw/viewform?usp=dialog"));
                   },
                   leading: const Icon(
                     Icons.delete,
