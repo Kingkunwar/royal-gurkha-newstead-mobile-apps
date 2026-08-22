@@ -16,6 +16,11 @@ class CartItemHolder {
       totalItemCount: totalItemCount ?? this.totalItemCount,
     );
   }
+
+  @override
+  String toString() {
+    return 'CartItemHolder(item: $item, totalItemCount: $totalItemCount)';
+  }
 }
 
 class CartItemModel {
@@ -40,4 +45,19 @@ class CartItemModel {
     this.cartKind,
     this.mealDealId,
   });
+
+  @override
+  String toString() {
+    return 'CartItemModel('
+        'price: $price, '
+        'title: $title, '
+        'itemId: $itemId, '
+        'categoryId: $categoryId, '
+        'rate: $rate, '
+        'qty: $qty, '
+        'note: $note, '
+        'cartKind: $cartKind, '
+        'mealDealId: $mealDealId'
+        ')';
+  }
 }

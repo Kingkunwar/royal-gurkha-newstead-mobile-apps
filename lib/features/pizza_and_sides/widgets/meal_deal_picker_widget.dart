@@ -425,7 +425,12 @@ class _MealDealPickerWidgetState extends State<MealDealPickerWidget> {
     int level = 0;
 
     while (true) {
-      final chainNode = level < slot.chain.length ? slot.chain[level] : null;
+      // Bind a per-iteration constant: `level` is mutated in place by this
+      // loop, so an onChanged closure capturing it directly would see its
+      // *final* value once invoked later, not the level it was built for.
+      final int currentLevel = level;
+      final chainNode =
+          currentLevel < slot.chain.length ? slot.chain[currentLevel] : null;
       int? selectedIndex;
       if (chainNode != null) {
         final index =
@@ -444,7 +449,7 @@ class _MealDealPickerWidgetState extends State<MealDealPickerWidget> {
             labelBuilder: (index) => options[index].title,
             onChanged: (index) {
               setState(() {
-                final newChain = slot.chain.sublist(0, level);
+                final newChain = slot.chain.sublist(0, currentLevel);
                 if (index != null) {
                   newChain.add(options[index]);
                 }
