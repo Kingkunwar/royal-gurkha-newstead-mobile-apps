@@ -102,9 +102,10 @@ class _MealDealPickerWidgetState extends State<MealDealPickerWidget> {
 
     final lines = <String>[widget.mealDeal.title ?? ''];
     for (final selector in _selectors) {
-      for (final slot in _slots[_selectorId(selector)]!) {
-        lines.add(slot.chain.last.title);
-      }
+      final titles = _slots[_selectorId(selector)]!
+          .map((slot) => slot.chain.last.title)
+          .toList();
+      lines.add(titles.join(', '));
     }
 
     final title = lines.join('\n');

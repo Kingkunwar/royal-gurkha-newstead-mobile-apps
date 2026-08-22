@@ -8,7 +8,6 @@ import 'package:restaurantapp/app/custom_widgets/custom_textfield.dart';
 import 'package:restaurantapp/app/custom_widgets/delivery_widget.dart';
 import 'package:restaurantapp/app/custom_widgets/primary_button.dart';
 import 'package:restaurantapp/app/custom_widgets/screen_padding.dart';
-import 'package:restaurantapp/app/dialogs/custom_info_dialog.dart';
 import 'package:restaurantapp/app/dialogs/loading_dialog.dart';
 import 'package:restaurantapp/app/functions/input_validators.dart';
 import 'package:restaurantapp/app/functions/navigation_functions.dart';
@@ -502,8 +501,6 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                   "isTrusted": true,
                                 }
                               };
-                              print(body);
-                              return;
                               bool isCollection =
                                   locator<CurrentServiceTypeCubit>().state ==
                                       ServiceType.collection;
