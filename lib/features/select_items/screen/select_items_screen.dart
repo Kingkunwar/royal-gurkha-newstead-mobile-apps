@@ -27,6 +27,7 @@ class _SelectItemsScreenState extends State<SelectItemsScreen> {
       title: "Online Order",
       child: const PizzaAndSidesScreen(),
     ),
+
     // MenuItemsModel(
     //   title: "Indian & Nepalese",
     //   child: const IndianNepaleseFoodScreen(),
@@ -59,7 +60,6 @@ class _SelectItemsScreenState extends State<SelectItemsScreen> {
             actions: [
               EaseInWidget(
                 onTap: () {
-                  
                   pushNamed(
                     context: context,
                     routeName: AppRoutes.profileScreen,

@@ -5,6 +5,8 @@ import 'package:restaurantapp/app/custom_widgets/custom_pull_to_refresh_widget.d
 import 'package:restaurantapp/core/network/service_locator/service_locator.dart';
 import 'package:restaurantapp/features/indian_nepalese_food/bloc/indian_nepalese_food_bloc.dart';
 import 'package:restaurantapp/features/indian_nepalese_food/repo/indian_nepalese_food_repo.dart';
+import 'package:restaurantapp/features/meal_deals/bloc/meal_deal_bloc.dart';
+import 'package:restaurantapp/features/meal_deals/model/meal_deal_model.dart';
 import 'package:restaurantapp/features/pizza_and_sides/widgets/pizza_and_sides_tabbar_widget.dart';
 
 class PizzaAndSidesScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _PizzaAndSidesScreenState extends State<PizzaAndSidesScreen> {
         foodType: FoodType.pizzaAndSides,
       ),
     );
+    locator<MealDealBloc>().add(FetchMealDealEvent());
   }
 
   @override
@@ -58,9 +61,17 @@ class _PizzaAndSidesScreenState extends State<PizzaAndSidesScreen> {
             //   state: state,
             //   onRefresh: _fetchPizzaAndSides,
             // );
-            return PizzaAndSidesTabbarScreen(
-              onRefresh: _fetchPizzaAndSides,
-              state: state,
+            return BlocSelector<MealDealBloc, MealDealState, MealDealModel?>(
+              selector: (state) {
+                return state is MealDealFetchedState ? state.mealDeal : null;
+              },
+              builder: (context, mealDeal) {
+                return PizzaAndSidesTabbarScreen(
+                  onRefresh: _fetchPizzaAndSides,
+                  state: state,
+                  mealDeal: mealDeal,
+                );
+              },
             );
           }
           return const SizedBox();

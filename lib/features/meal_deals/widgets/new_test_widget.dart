@@ -100,7 +100,7 @@ class _TestWidgetState extends State<TestWidget> {
                 itemBuilder: (_, newIndex) {
                   MealDealItems item = widget.state.mealDeal
                       .mealDealItems![widget.index].mealDealItems![newIndex];
-                  return item.options == 1
+                  return item.options == "1"
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

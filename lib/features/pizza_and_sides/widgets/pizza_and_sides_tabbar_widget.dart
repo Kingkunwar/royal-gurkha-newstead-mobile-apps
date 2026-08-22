@@ -4,20 +4,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:restaurantapp/app/custom_widgets/custom_text_tabbar_widget.dart';
 import 'package:restaurantapp/app/custom_widgets/screen_padding.dart';
 import 'package:restaurantapp/app/functions/show_toast.dart';
+import 'package:restaurantapp/core/constants/app_colors.dart';
 import 'package:restaurantapp/features/cart/bloc/cart_bloc.dart';
 import 'package:restaurantapp/features/cart/models/cart_item_model.dart';
 import 'package:restaurantapp/features/indian_nepalese_food/bloc/indian_nepalese_food_bloc.dart';
 import 'package:restaurantapp/features/indian_nepalese_food/model/indian_nepalese_food_model.dart';
+import 'package:restaurantapp/features/meal_deals/model/meal_deal_model.dart';
 import 'package:restaurantapp/features/pizza_and_sides/widgets/food_picker_widget.dart';
+import 'package:restaurantapp/features/pizza_and_sides/widgets/meal_deal_picker_widget.dart';
 import 'package:restaurantapp/main.dart';
 
 class PizzaAndSidesTabbarScreen extends StatefulWidget {
   final IndianNepaleseFoodFetchedState state;
+  final MealDealModel? mealDeal;
   final Function() onRefresh;
   const PizzaAndSidesTabbarScreen({
     super.key,
     required this.onRefresh,
     required this.state,
+    this.mealDeal,
   });
 
   @override
@@ -115,7 +120,8 @@ class _PizzaAndSidesTabbarScreenState extends State<PizzaAndSidesTabbarScreen> {
                                                               e.id.toString(),
                                                           price: e.price
                                                               .toString(),
-                                                          title:"${e.title} ${item.title}",
+                                                          title:
+                                                              "${e.title} ${item.title}",
                                                           categoryId: item
                                                               .categoryId
                                                               .toString(),
@@ -178,14 +184,130 @@ class _PizzaAndSidesTabbarScreenState extends State<PizzaAndSidesTabbarScreen> {
       valueListenable: _selectedIndex,
       builder: (context, index, child) {
         return CustomTabbarWidget(
-          bodies: tabItems,
-          titles: widget.state.foodModel.foodItems != null
-              ? widget.state.foodModel.foodItems!
-                  .map(
-                    (e) => e.title ?? "",
-                  )
-                  .toList()
-              : [],
+          bodies: [
+            if (widget.mealDeal != null &&
+                widget.mealDeal?.mealDealItems != null &&
+                widget.mealDeal!.mealDealItems!.isNotEmpty)
+              ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(
+                  height: 5.h,
+                ),
+                padding: EdgeInsets.zero,
+                itemCount: widget.mealDeal!.mealDealItems!.length,
+                // shrinkWrap: true,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final item = widget.mealDeal!.mealDealItems![index];
+                  return GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        useSafeArea: true,
+                        builder: (context) {
+                          return MealDealPickerWidget(
+                            mealDeal: item,
+                          );
+                        },
+                      );
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: SizedBox(
+                      width: 1.sw,
+                      child: ScreenPadding(
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xFFCFCFCF),
+                                ),
+                              ),
+                              padding: EdgeInsets.only(top: 8.h),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 16.w,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.title ?? "",
+                                          maxLines: 2,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge,
+                                        ),
+                                        SizedBox(
+                                          height: 10.h,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            right: 44.w,
+                                          ),
+                                          child: Text(
+                                            item.details?.replaceAll(
+                                                    RegExp(r'</?p>'), '') ??
+                                                '',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.primaryColor,
+                                                ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 12.h,
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Spacer(),
+                                Container(
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  padding: EdgeInsets.all(5.w),
+                                  child: Icon(
+                                    Icons.menu,
+                                    color: Colors.white,
+                                    size: 30.sp,
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ...tabItems
+          ],
+          titles: [
+            if (widget.mealDeal != null &&
+                widget.mealDeal?.mealDealItems != null &&
+                widget.mealDeal!.mealDealItems!.isNotEmpty)
+              "Meal Deal",
+            ...widget.state.foodModel.foodItems != null
+                ? widget.state.foodModel.foodItems!
+                    .map(
+                      (e) => e.title ?? "",
+                    )
+                    .toList()
+                : []
+          ],
         );
       },
     );

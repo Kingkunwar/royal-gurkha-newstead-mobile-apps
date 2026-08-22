@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurantapp/features/meal_deals/model/meal_deal_option.dart';
 
 class MealDealModel {
   List<MealDealHolder>? mealDealItems;
@@ -30,7 +31,7 @@ class MealDealHolder {
   String? createdAt;
   String? updatedAt;
   String? image;
-  int? options;
+  String? options;
   List<MealDealItems>? mealDealItems;
 
   MealDealHolder({
@@ -50,7 +51,7 @@ class MealDealHolder {
   MealDealHolder.fromJson(Map<String, dynamic> json) {
     try {
       id = json['id'];
-      options = json['options'];
+      options = json['options']?.toString();
       title = json['title'];
       price = json['price']?.toString();
       status = json['status'];
@@ -73,12 +74,77 @@ class MealDealHolder {
       debugPrint(e.toString());
     }
   }
+
+  /// The meal deal items that should be rendered as their own selector row
+  /// in the picker (eg. "Please Select Your Item", "Choose Any Curry").
+  ///
+  /// This is positional, not content-based: the first item is always the
+  /// fixed/base component, the second is always the curry chooser, and
+  /// everything after that is a detail list only shown once its category is
+  /// picked. We can't infer this from the second item's own `item` field
+  /// because the backend doesn't reliably populate it — it's sometimes the
+  /// category list, sometimes empty — so [topLevelOptionsFor] derives its
+  /// options from the titles of the remaining items instead.
+  List<MealDealItems> get topLevelItems {
+    final items = mealDealItems ?? [];
+    if (items.length <= 2) {
+      return items;
+    }
+    return items.take(2).toList();
+  }
+
+  /// The selectable options for [selector]'s first dropdown. For the second
+  /// top-level item (the curry chooser) this is derived from the titles of
+  /// every item that follows it, ignoring its own (unreliable) `item` field.
+  /// Everything else just uses its own parsed `item` field.
+  List<MealDealNode> topLevelOptionsFor(MealDealItems selector) {
+    final items = mealDealItems ?? [];
+    final index = items.indexOf(selector);
+    if (index == 1 && items.length > 2) {
+      return items
+          .skip(2)
+          .where((item) => item.title != null)
+          .map((item) => MealDealNode(title: item.title!))
+          .toList();
+    }
+    return selector.parsedNodes;
+  }
+
+  MealDealItems? itemWithTitle(String title) {
+    if (mealDealItems == null) {
+      return null;
+    }
+    for (final item in mealDealItems!) {
+      if (item.title == title) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  /// Resolves the next level of choices under [node]: its own bracketed
+  /// sub-options if it has any, otherwise the option list of the meal deal
+  /// item whose title matches [node]'s title (eg. picking "Popular Indian
+  /// Curry" reveals the dish groups defined by the item titled the same).
+  /// An empty result means [node] is a final, directly selectable choice.
+  List<MealDealNode> childrenOf(MealDealNode node) {
+    if (node.children.isNotEmpty) {
+      return node.children;
+    }
+    final referenced = itemWithTitle(node.title);
+    if (referenced != null) {
+      return referenced.parsedNodes;
+    }
+    return const [];
+  }
+
+  bool isLeaf(MealDealNode node) => childrenOf(node).isEmpty;
 }
 
 class MealDealItems {
   int? id;
   int? mealDealId;
-  int? options;
+  String? options;
   String? title;
   String? price;
   String? item;
@@ -109,7 +175,7 @@ class MealDealItems {
   MealDealItems.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     mealDealId = json['meal_deal_id'];
-    options = json['options'];
+    options = json['options']?.toString();
     title = json['title'];
     item = json['item'];
     categoryId = json['category_id'];
@@ -121,6 +187,8 @@ class MealDealItems {
     category =
         json['category'] != null ? Category.fromJson(json['category']) : null;
   }
+
+  List<MealDealNode> get parsedNodes => parseMealDealNodes(item);
 }
 
 class Category {

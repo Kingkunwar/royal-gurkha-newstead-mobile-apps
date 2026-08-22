@@ -461,7 +461,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                 "carts": cartState
                                     .map(
                                       (e) => {
-                                        "id": e.item.itemId,
+                                        "id": e.item.cartKind == "mealdeal" &&
+                                                e.item.mealDealId != null
+                                            ? e.item.mealDealId
+                                            : e.item.itemId,
                                         "category_id": e.item.categoryId,
                                         "title": e.item.title,
                                         "rate": e.item.rate == "null"
@@ -476,6 +479,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                             : e.totalItemCount *
                                                 (num.tryParse(e.item.rate) ??
                                                     0),
+                                        "note": e.item.note ?? "",
+                                        if (e.item.cartKind != null)
+                                          "cart_kind": e.item.cartKind,
+                                        if (e.item.mealDealId != null)
+                                          "meal_deal_id": e.item.mealDealId,
                                       },
                                     )
                                     .toList(),

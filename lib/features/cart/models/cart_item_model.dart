@@ -25,6 +25,9 @@ class CartItemModel {
   String categoryId;
   String rate;
   int qty;
+  String? note;
+  String? cartKind;
+  int? mealDealId;
 
   CartItemModel({
     required this.price,
@@ -33,5 +36,8 @@ class CartItemModel {
     required this.categoryId,
     required this.qty,
     required this.rate,
+    this.note,
+    this.cartKind,
+    this.mealDealId,
   });
 }
