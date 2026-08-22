@@ -105,12 +105,16 @@ class _MealDealPickerWidgetState extends State<MealDealPickerWidget> {
       final titles = _slots[_selectorId(selector)]!
           .map((slot) => slot.chain.last.title)
           .toList();
-      lines.add(titles.join(', '));
+      lines.addAll(titles);
     }
 
     final title = lines.join('\n');
-    final itemId =
-        "mealdeal_${widget.mealDeal.id}_${lines.join(',').hashCode}";
+    // Built from the selection titles directly rather than their hashCode:
+    // different selections must always yield different ids, and a hash can
+    // collide between two distinct-but-similar selections (eg. two "Set
+    // Meal 2" picks differing only in curry), which would make CartBloc
+    // treat them as the same line and silently overwrite the first pick.
+    final itemId = "mealdeal_${widget.mealDeal.id}_${lines.join('|')}";
 
     BlocProvider.of<CartBloc>(context).add(
       AddItemToCartEvent(
