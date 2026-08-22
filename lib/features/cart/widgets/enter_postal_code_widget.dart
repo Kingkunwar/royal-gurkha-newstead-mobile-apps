@@ -7,11 +7,11 @@ import 'package:restaurantapp/app/custom_widgets/screen_padding.dart';
 import 'package:restaurantapp/app/functions/input_validators.dart';
 import 'package:restaurantapp/app/functions/navigation_functions.dart';
 import 'package:restaurantapp/app/routes/app_routes.dart';
+import 'package:restaurantapp/core/constants/app_colors.dart';
 import 'package:restaurantapp/core/constants/app_constants.dart';
 import 'package:restaurantapp/core/network/service_locator/service_locator.dart';
 import 'package:restaurantapp/features/checkout/cubit/postal_code_handler_cubit.dart';
 import 'package:restaurantapp/features/postal_code/bloc/search_postal_code_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class EnterPostalCodeWidget extends StatefulWidget {
   const EnterPostalCodeWidget({super.key});
@@ -23,39 +23,8 @@ class EnterPostalCodeWidget extends StatefulWidget {
 class _EnterPostalCodeWidgetState extends State<EnterPostalCodeWidget> {
   final TextEditingController _postalCodeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // SuccessPostalCodeModel? successPostalCodeModel;
-  // String? errorMessage;
-  // List<String> addresses = [];
   String selectedAddress = '';
   String deliveryCharge = '';
-
-  // _checkPostalCode() async {
-  //   setState(() {
-  //     successPostalCodeModel = null;
-  //     errorMessage = null;
-  //     selectedAddress = '';
-  //   });
-  //   final Response? response = await locator<BaseClient>()
-  //       .postRequest(path: "/check-postalcode", data: {
-  //     "postal_code": _postalCodeController.text,
-  //   });
-  //   if (response != null &&
-  //       response.data['status'] != null &&
-  //       response.data['status'] == "success") {
-  //     _fetchAddressesFromPostalCode();
-  //     setState(() {
-  //       successPostalCodeModel = SuccessPostalCodeModel.fromJson(response.data);
-  //     });
-  //   } else if (response != null && response.data['status'] == "fail") {
-  //     setState(() {
-  //       errorMessage = response.data['msg'] ?? "Something went wrong.";
-  //     });
-  //   } else {
-  //     setState(() {
-  //       errorMessage = "Something went wrong.";
-  //     });
-  //   }
-  // }
 
   bool everyThingIsSelected(SearchPostalCodeState state) {
     return selectedAddress.isNotEmpty && state is SearchSuccessState;
@@ -80,16 +49,33 @@ class _EnterPostalCodeWidgetState extends State<EnterPostalCodeWidget> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 20.h,
+                  SizedBox(height: 24.h),
+                  Container(
+                    height: 56.w,
+                    width: 56.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.location_on_outlined,
+                      color: AppColors.primaryColor,
+                      size: 28.sp,
+                    ),
                   ),
+                  SizedBox(height: 14.h),
                   Text(
                     "Enter your postal code",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  SizedBox(
-                    height: 10.h,
+                  SizedBox(height: 4.h),
+                  Text(
+                    "We'll use this to find your delivery address",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
                   ),
+                  SizedBox(height: 18.h),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -107,126 +93,173 @@ class _EnterPostalCodeWidgetState extends State<EnterPostalCodeWidget> {
                           hintText: "Postal Code",
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            locator<SearchPostalCodeBloc>().add(
-                              SearchForPostalCodeEvent(
-                                query: _postalCodeController.text,
-                              ),
-                            );
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.sync,
+                      SizedBox(width: 8.w),
+                      Material(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10.r),
+                          onTap: () {
+                            if (_formKey.currentState!.validate()) {
+                              locator<SearchPostalCodeBloc>().add(
+                                SearchForPostalCodeEvent(
+                                  query: _postalCodeController.text,
+                                ),
+                              );
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(12.w),
+                            child: Icon(
+                              Icons.sync,
+                              color: Colors.white,
+                              size: 22.sp,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  if (state is SearchFailureState) ...{
-                    Text(
-                      state.failure.message!,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Colors.red,
-                          ),
-                    )
-                  },
-                  10.verticalSpace,
-                  if (state is SearchSuccessState) ...{
+                  if (state is SearchingPostalCodeState) ...{
+                    SizedBox(height: 10.h),
                     SizedBox(
-                      height: 10.h,
+                      height: 3.h,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: LinearProgressIndicator(
+                          color: AppColors.primaryColor,
+                          backgroundColor:
+                              AppColors.primaryColor.withValues(alpha: 0.15),
+                        ),
+                      ),
                     ),
-                    ScreenPadding(
-                      padding: 5.w,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(
-                            5.r,
+                  },
+                  if (state is SearchFailureState) ...{
+                    SizedBox(height: 10.h),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10.w),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: Colors.red.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 18.sp,
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Text(
+                              state.failure.message!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  },
+                  if (state is SearchSuccessState) ...{
+                    SizedBox(height: 16.h),
+                    Text(
+                      "Select your address",
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    SizedBox(height: 8.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: DropdownMenu<String>(
+                        initialSelection: state.fetchedAddresses.first,
+                        trailingIcon: const Icon(Icons.keyboard_arrow_down),
+                        textStyle: Theme.of(context).textTheme.bodyLarge,
+                        inputDecorationTheme: InputDecorationTheme(
+                          filled: true,
+                          fillColor: const Color(0xFFF4F6F9),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 10.h,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10.r),
                           ),
                         ),
-                        padding: EdgeInsets.zero,
-                        child: DropdownMenu<String>(
-                          initialSelection: state.fetchedAddresses.first,
-                          trailingIcon: Icon(Icons.keyboard_arrow_down),
-
-                          textStyle: Theme.of(context).textTheme.bodyLarge,
-                          onSelected: (String? value) {
-                            // This is called when the user selects an item.
+                        onSelected: (String? value) {
+                          setState(() {
+                            selectedAddress = value!;
+                          });
+                        },
+                        dropdownMenuEntries: state.fetchedAddresses
+                            .map<DropdownMenuEntry<String>>(
+                          (String value) {
+                            return DropdownMenuEntry<String>(
+                              value: value,
+                              label: value,
+                            );
+                          },
+                        ).toList(),
+                      ),
+                    ),
+                    if (everyThingIsSelected(state)) ...{
+                      SizedBox(height: 4.h),
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: () {
+                            locator<SearchPostalCodeBloc>()
+                                .add(ClearPostalCodeEvent());
                             setState(() {
-                              selectedAddress = value!;
+                              selectedAddress = "";
                             });
                           },
-                          // trailingIcon: Icon(
-                          //   Icons.perm_camera_mic,
-                          //   color: Colors.black,
-                          // ),
-                          // trailingIcon: Icon(
-                          //   Icons.keyboard_arrow_down,
-                          //   color: Colors.grey,
-                          //   size: 30.sp,
-                          // ),
-                          dropdownMenuEntries: state.fetchedAddresses
-                              .map<DropdownMenuEntry<String>>(
-                            (String value) {
-                              return DropdownMenuEntry<String>(
-                                value: value,
-                                label: value,
-                              );
-                            },
-                          ).toList(),
+                          icon: Icon(Icons.close, size: 16.sp),
+                          label: const Text("Clear location"),
                         ),
                       ),
-                    )
+                    },
                   },
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  if (!everyThingIsSelected(state)) ...{
-                    // PrimaryButton(
-                    //   buttonTitle: "Confirm",
-                    //   onTap: () {
-                    //     if (_formKey.currentState!.validate()) {
-                    //       // _checkPostalCode();
-                    //       locator<SearchPostalCodeBloc>().add(
-                    //         SearchForPostalCodeEvent(
-                    //           query: _postalCodeController.text,
-                    //         ),
-                    //       );
-                    //     }
-                    //   },
-                    // ),
-                  } else
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                          locator<SearchPostalCodeBloc>()
-                              .add(ClearPostalCodeEvent());
-                          setState(() {
-                            selectedAddress = "";
-                          });
-                          // Focus.of(context).requestFocus();
-                        },
-                        child: const Text(
-                          "Clear location",
-                        ),
-                      ),
-                    ),
+                  SizedBox(height: 18.h),
                   const Divider(),
-                  SizedBox(
-                    height: 10.h,
+                  SizedBox(height: 10.h),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F6F9),
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 18.sp,
+                          color: Colors.grey.shade600,
+                        ),
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Text(
+                            "If your address doesn't load, please tap the sync icon above.",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(color: Colors.grey.shade600),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const Row(
-                    children: [
-                      Text("Note: If address doesn't load, Please click on "),
-                      Icon(
-                        Icons.sync,
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
+                  SizedBox(height: 20.h),
                   if (everyThingIsSelected(state) &&
                       selectedAddress != AppConstants.pleaseSelectAnAddress)
                     PrimaryButton(
@@ -246,6 +279,7 @@ class _EnterPostalCodeWidgetState extends State<EnterPostalCodeWidget> {
                         );
                       },
                     ),
+                  SizedBox(height: 12.h),
                 ],
               ),
             ),

@@ -3,16 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:restaurantapp/core/constants/app_colors.dart';
 
 final lightTheme = ThemeData(
   useMaterial3: true,
+  fontFamily: GoogleFonts.inter().fontFamily,
   primaryColor: AppColors.primaryColor,
   colorScheme: const ColorScheme(
     brightness: Brightness.light,
     primary: AppColors.primaryColor,
     onPrimary: AppColors.primaryColor,
-    secondary: Colors.white,
+    secondary: AppColors.secondaryColor,
     onSecondary: Colors.white,
     error: Colors.red,
     onError: Colors.red,
@@ -36,7 +38,8 @@ final lightTheme = ThemeData(
       const Color.fromRGBO(35, 116, 225, 0.2),
     ),
   ),
-  splashColor: AppColors.primaryColor,
+  splashColor: Colors.transparent,
+  highlightColor: Colors.transparent,
   scaffoldBackgroundColor: Colors.white,
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
